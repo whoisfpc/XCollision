@@ -52,6 +52,7 @@ namespace XCollision.Core
             }
             bounds.Min = new Vector3(minX, minY, minZ);
             bounds.Max = new Vector3(maxX, maxY, maxZ);
+            bounds.Center = position;
         }
     }
 }
