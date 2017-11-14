@@ -9,6 +9,7 @@ namespace XCollision.Core
     public class XPhysics
     {
         public Vector3 gravity = Vector3.down * 9.8f;
+        public bool useGravity = true;
 
         private IList<XCollider> colliders = new List<XCollider>();
 
@@ -26,7 +27,8 @@ namespace XCollision.Core
         {
             for (int i = 0; i < colliders.Count; i++)
             {
-                colliders[i].AddForce(gravity);
+                if (useGravity)
+                    colliders[i].AddForce(gravity);
                 colliders[i].Update(dt);
             }
         }

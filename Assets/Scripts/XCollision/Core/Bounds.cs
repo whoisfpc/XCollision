@@ -31,6 +31,7 @@ namespace XCollision.Core
                 extents = value;
                 max = center + extents;
                 min = center - extents;
+                size = extents * 2;
             }
         }
         public Vector3 Max
@@ -44,6 +45,7 @@ namespace XCollision.Core
                 max = value;
                 center = (max + min) / 2;
                 extents = (max - min) / 2;
+                size = extents * 2;
             }
         }
         public Vector3 Min
@@ -57,6 +59,7 @@ namespace XCollision.Core
                 min = value;
                 center = (max + min) / 2;
                 extents = (max - min) / 2;
+                size = extents * 2;
             }
         }
         public Vector3 Size
@@ -69,6 +72,8 @@ namespace XCollision.Core
             {
                 size = value;
                 extents = size / 2;
+                max = center + extents;
+                min = center - extents;
             }
         }
 
@@ -77,6 +82,10 @@ namespace XCollision.Core
         private Vector3 max;
         private Vector3 min;
         private Vector3 size;
+
+        public Bounds() : this(Vector3.zero, Vector3.zero)
+        {
+        }
 
         public Bounds(Vector3 center, Vector3 size)
         {

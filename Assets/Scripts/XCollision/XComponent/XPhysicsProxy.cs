@@ -14,6 +14,7 @@ namespace XCollision.XComponent
                 return instance;
             }
         }
+        public bool useGravity;
         private static XPhysics instance;
         private float lastFixTime;
 
@@ -21,7 +22,13 @@ namespace XCollision.XComponent
         {
             if (instance == null)
                 instance = new XPhysics();
+            instance.useGravity = useGravity;
             lastFixTime = Time.time;
+        }
+
+        private void Update()
+        {
+            instance.useGravity = useGravity;
         }
 
         private void FixedUpdate()
