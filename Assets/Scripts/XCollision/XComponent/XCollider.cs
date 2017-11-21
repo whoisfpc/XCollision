@@ -7,6 +7,7 @@ namespace XCollision.XComponent
         public static Color colliderColor = new Color(0.451f, 0.855f, 0);
         public static Color boundsColor = Color.yellow;
 
+        public bool showBounds;
         protected Core.XCollider col;
 
         protected virtual void Start()
@@ -17,7 +18,7 @@ namespace XCollision.XComponent
         protected virtual void Update()
         {
             if (col != null)
-                transform.position = col.position;
+                transform.position = col.Position;
         }
 
         protected virtual void OnDrawGizmosSelected()

@@ -4,9 +4,18 @@ namespace XCollision.Core
 {
     public abstract class XCollider
     {
-        public Vector3 position;
-        public XRigibody rigibody;
-        public Bounds bounds;
+        public Vector3 Position
+        {
+            get
+            {
+                return position;
+            }
+            set
+            {
+                position = value;
+                bounds.Center = position;
+            }
+        }
         public float Rotation
         {
             get
@@ -23,6 +32,10 @@ namespace XCollision.Core
                 }
             }
         }
+
+        public XRigibody rigibody;
+        public Bounds bounds;
+        private Vector3 position;
         private float rotation;
 
         public XCollider(Vector3 position, float rotation)
@@ -42,7 +55,7 @@ namespace XCollision.Core
 
         public void Update(float dt)
         {
-            position += rigibody.velocity * dt;
+            Position += rigibody.velocity * dt;
 
             rigibody.Update(dt);
         }

@@ -25,13 +25,22 @@ namespace XCollision.XComponent
 
         public static void DrawShpere(Vector3 center, float radius, Color color)
         {
-            var up = Camera.current.transform.position - center;
-            var d2 = up.sqrMagnitude;
-            var d = up.magnitude;
-            var r = Mathf.Sqrt(d2 - radius * radius) * radius / d;
-
+            var colorBackup = Gizmos.color;
+            Gizmos.color = color;
             Gizmos.DrawWireSphere(center, radius);
-            DebugExtension.DrawCircle(center + up.normalized * (radius * radius) / d, up, color, r);
+            var up = Camera.current.transform.position - center;
+            if (Camera.current.orthographic)
+            {
+                DebugExtension.DrawCircle(center, up.normalized, color, radius);
+            }
+            else
+            {
+                var d2 = up.sqrMagnitude;
+                var d = up.magnitude;
+                var r = Mathf.Sqrt(d2 - radius * radius) * radius / d;
+                DebugExtension.DrawCircle(center + up.normalized * (radius * radius) / d, up, color, r);
+            }
+            Gizmos.color = colorBackup;
         }
     }
 }

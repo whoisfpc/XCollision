@@ -2,9 +2,8 @@
 
 namespace XCollision.XComponent
 {
-    public class CubeCollider : XCollider
+    public class CubeXCollider : XCollider
     {
-        public bool showBounds;
         public Vector3 size;
 
         protected override void Start()

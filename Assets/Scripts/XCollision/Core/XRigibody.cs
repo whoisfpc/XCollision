@@ -4,9 +4,15 @@ namespace XCollision.Core
 {
     public class XRigibody
     {
+        public float Mass
+        {
+            get { return mass; }
+            set { mass = value; inverseMass = 1 / mass; }
+        }
         public Vector3 velocity;
-        public float mass = 1;
+        private float mass = 1;
         private Vector3 totalForce;
+        private float inverseMass = 1;
 
         public void AddForce(Vector3 force)
         {
@@ -15,7 +21,7 @@ namespace XCollision.Core
 
         public void Update(float dt)
         {
-            var acc = totalForce / mass;
+            var acc = totalForce * inverseMass;
             velocity += acc * dt;
             totalForce = Vector3.zero;
         }
