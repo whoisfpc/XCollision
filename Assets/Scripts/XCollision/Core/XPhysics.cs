@@ -20,7 +20,7 @@ namespace XCollision.Core
 
         public void RemoveCollider(XCollider collider)
         {
-
+            throw new System.NotImplementedException();
         }
 
         public void Update(float dt)
@@ -30,6 +30,17 @@ namespace XCollision.Core
                 if (useGravity)
                     colliders[i].AddForce(gravity);
                 colliders[i].Update(dt);
+            }
+
+            for (int i = 0; i < colliders.Count; i++)
+            {
+                for (int j = i + 1; j < colliders.Count; j++)
+                {
+                    // collider detect i & j
+                    if (!colliders[i].bounds.Intersects(colliders[j].bounds))
+                        continue;
+                    colliders[i].Intersects(colliders[j]);
+                }
             }
         }
     }

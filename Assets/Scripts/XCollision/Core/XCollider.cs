@@ -48,6 +48,8 @@ namespace XCollision.Core
 
         public abstract void CalcBounds();
 
+        public abstract void Intersects(XCollider other);
+
         public void AddForce(Vector3 force)
         {
             rigidbody.AddForce(force);

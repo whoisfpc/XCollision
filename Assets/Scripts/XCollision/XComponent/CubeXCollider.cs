@@ -8,7 +8,7 @@ namespace XCollision.XComponent
 
         protected override void Awake()
         {
-            col = new Core.CubeCollider(transform.position, size, transform.rotation.eulerAngles.y*Mathf.Deg2Rad);
+            col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y*Mathf.Deg2Rad);
             XPhysicsProxy.Instance.AddCollider(col);
         }
 
@@ -23,9 +23,9 @@ namespace XCollision.XComponent
             var colorBackup = Gizmos.color;
             Gizmos.color = colliderColor;
             var backup = Gizmos.matrix;
-            Gizmos.matrix = Matrix4x4.Rotate(Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0));
+            Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0), Vector3.one);
 
-            Gizmos.DrawWireCube(transform.position, size);
+            Gizmos.DrawWireCube(Vector3.zero, size);
 
             if (showBounds && col != null)
             {

@@ -95,5 +95,14 @@ namespace XCollision.Core
             max = center + extents;
             min = center - extents;
         }
+
+        public bool Intersects(Bounds other)
+        {
+            if (max.x < other.min.x || max.y < other.min.y || max.z < other.min.z)
+                return false;
+            if (min.x > other.max.x || min.y > other.max.y || min.z > other.max.z)
+                return false;
+            return true;
+        }
     }
 }

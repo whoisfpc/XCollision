@@ -9,7 +9,7 @@ namespace XCollision.XComponent
 
         protected override void Awake()
         {
-            col = new Core.CylinderCollider(transform.position, radius, height);
+            col = new Core.CylinderXCollider(transform.position, radius, height);
             XPhysicsProxy.Instance.AddCollider(col);
         }
 

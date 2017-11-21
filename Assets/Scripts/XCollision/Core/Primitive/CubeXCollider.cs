@@ -4,16 +4,16 @@ using Mathf = UnityEngine.Mathf;
 
 namespace XCollision.Core
 {
-    public class CubeCollider : XCollider
+    public class CubeXCollider : XCollider
     {
 
         private Vector3 size;
 
-        public CubeCollider(Vector3 position, Vector3 size) : this(position, size, 0)
+        public CubeXCollider(Vector3 position, Vector3 size) : this(position, size, 0)
         {
         }
 
-        public CubeCollider(Vector3 position, Vector3 size, float rotation) : base(position, rotation)
+        public CubeXCollider(Vector3 position, Vector3 size, float rotation) : base(position, rotation)
         {
             this.size = size;
             CalcBounds();
@@ -53,6 +53,22 @@ namespace XCollision.Core
             bounds.Min = new Vector3(minX, minY, minZ);
             bounds.Max = new Vector3(maxX, maxY, maxZ);
             bounds.Center = Position;
+        }
+
+        public override void Intersects(XCollider other)
+        {
+            if (other is CubeXCollider)
+            {
+                ColliderIntersectHelper.Intersect(this, (CubeXCollider)other);
+            }
+            if (other is CylinderXCollider)
+            {
+                ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other);
+            }
+            if (other is SphereXCollider)
+            {
+                ColliderIntersectHelper.Intersect(this, (SphereXCollider)other);
+            }
         }
     }
 }

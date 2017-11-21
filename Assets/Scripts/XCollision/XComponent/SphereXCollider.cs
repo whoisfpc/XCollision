@@ -8,7 +8,7 @@ namespace XCollision.XComponent
 
         protected override void Awake()
         {
-            col = new Core.SphereCollider(transform.position, radius);
+            col = new Core.SphereXCollider(transform.position, radius);
             XPhysicsProxy.Instance.AddCollider(col);
         }
 
