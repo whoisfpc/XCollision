@@ -10,7 +10,12 @@ namespace XCollision.XComponent
         public bool showBounds;
         protected Core.XCollider col;
 
-        protected virtual void Start()
+        public Core.XRigidbody XRigidbody
+        {
+            get { return col.rigidbody; }
+        }
+
+        protected virtual void Awake()
         {
             
         }

@@ -33,7 +33,7 @@ namespace XCollision.Core
             }
         }
 
-        public XRigibody rigibody;
+        public XRigidbody rigidbody;
         public Bounds bounds;
         private Vector3 position;
         private float rotation;
@@ -42,7 +42,7 @@ namespace XCollision.Core
         {
             this.position = position;
             this.rotation = rotation;
-            rigibody = new XRigibody();
+            rigidbody = new XRigidbody();
             bounds = new Bounds();
         }
 
@@ -50,14 +50,14 @@ namespace XCollision.Core
 
         public void AddForce(Vector3 force)
         {
-            rigibody.AddForce(force);
+            rigidbody.AddForce(force);
         }
 
         public void Update(float dt)
         {
-            Position += rigibody.velocity * dt;
+            Position += rigidbody.velocity * dt;
 
-            rigibody.Update(dt);
+            rigidbody.Update(dt);
         }
     }
 }

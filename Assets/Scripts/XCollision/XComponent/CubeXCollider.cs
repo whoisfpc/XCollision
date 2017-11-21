@@ -6,7 +6,7 @@ namespace XCollision.XComponent
     {
         public Vector3 size;
 
-        protected override void Start()
+        protected override void Awake()
         {
             col = new Core.CubeCollider(transform.position, size, transform.rotation.eulerAngles.y*Mathf.Deg2Rad);
             XPhysicsProxy.Instance.AddCollider(col);

@@ -2,7 +2,7 @@
 
 namespace XCollision.Core
 {
-    public class XRigibody
+    public class XRigidbody
     {
         public float Mass
         {

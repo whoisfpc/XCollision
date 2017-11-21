@@ -6,7 +6,7 @@ namespace XCollision.XComponent
     {
         public float radius;
 
-        protected override void Start()
+        protected override void Awake()
         {
             col = new Core.SphereCollider(transform.position, radius);
             XPhysicsProxy.Instance.AddCollider(col);
