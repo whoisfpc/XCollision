@@ -20,35 +20,12 @@ namespace XCollision.XComponent
 
         protected override void OnDrawGizmosSelected()
         {
-            var colorBackup = Gizmos.color;
-            Gizmos.color = colliderColor;
-            var backup = Gizmos.matrix;
-            Gizmos.matrix = Matrix4x4.Translate(transform.position);
-
-            var halfH = height / 2;
-            GizmosHelper.DrawCircle(Vector3.zero, radius);
-            GizmosHelper.DrawCircle(Vector3.down * halfH, radius);
-            GizmosHelper.DrawCircle(Vector3.up * halfH, radius);
-
-            Gizmos.DrawLine(Vector3.right * radius + Vector3.down * halfH, Vector3.left * radius + Vector3.down * halfH);
-            Gizmos.DrawLine(Vector3.back * radius + Vector3.down * halfH, Vector3.forward * radius + Vector3.down * halfH);
-            Gizmos.DrawLine(Vector3.right * radius + Vector3.up * halfH, Vector3.left * radius + Vector3.up * halfH);
-            Gizmos.DrawLine(Vector3.back * radius + Vector3.up * halfH, Vector3.forward * radius + Vector3.up * halfH);
-
-            Gizmos.DrawLine(Vector3.right * radius + Vector3.down * halfH, Vector3.right * radius + Vector3.up * halfH);
-            Gizmos.DrawLine(Vector3.forward * radius + Vector3.down * halfH, Vector3.forward * radius + Vector3.up * halfH);
-            Gizmos.DrawLine(Vector3.left * radius + Vector3.down * halfH, Vector3.left * radius + Vector3.up * halfH);
-            Gizmos.DrawLine(Vector3.back * radius + Vector3.down * halfH, Vector3.back * radius + Vector3.up * halfH);
+            GizmosHelper.DrawCylinder(transform.position, radius, height, colliderColor);
 
             if (showBounds && col != null)
             {
-                Gizmos.matrix = Matrix4x4.identity;
-                Gizmos.color = boundsColor;
-                Gizmos.DrawWireCube(col.bounds.Center, col.bounds.Size);
+                GizmosHelper.DrawWireCube(col.bounds.Center, col.bounds.Size, boundsColor);
             }
-
-            Gizmos.color = colorBackup;
-            Gizmos.matrix = backup;
         }
     }
 }

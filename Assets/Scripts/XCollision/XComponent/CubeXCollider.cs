@@ -20,21 +20,11 @@ namespace XCollision.XComponent
 
         protected override void OnDrawGizmosSelected()
         {
-            var colorBackup = Gizmos.color;
-            Gizmos.color = colliderColor;
-            var backup = Gizmos.matrix;
-            Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0), Vector3.one);
-
-            Gizmos.DrawWireCube(Vector3.zero, size);
-
+            GizmosHelper.DrawWireCube(transform.position, size, Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0), colliderColor);
             if (showBounds && col != null)
             {
-                Gizmos.matrix = Matrix4x4.identity;
-                Gizmos.color = boundsColor;
-                Gizmos.DrawWireCube(col.bounds.Center, col.bounds.Size);
+                GizmosHelper.DrawWireCube(col.bounds.Center, col.bounds.Size, boundsColor);
             }
-            Gizmos.color = colorBackup;
-            Gizmos.matrix = backup;
         }
     }
 }

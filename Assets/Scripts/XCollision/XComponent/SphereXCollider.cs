@@ -14,16 +14,11 @@ namespace XCollision.XComponent
 
         protected override void OnDrawGizmosSelected()
         {
-            var colorBackup = Gizmos.color;
-
             GizmosHelper.DrawShpere(transform.position, radius, colliderColor);
             if (showBounds && col != null)
             {
-                Gizmos.color = boundsColor;
-                Gizmos.DrawWireCube(col.bounds.Center, col.bounds.Size);
+                GizmosHelper.DrawWireCube(col.bounds.Center, col.bounds.Size, boundsColor);
             }
-
-            Gizmos.color = colorBackup;
         }
     }
 }
