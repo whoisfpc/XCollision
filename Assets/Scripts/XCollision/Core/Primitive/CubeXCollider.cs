@@ -7,7 +7,7 @@ namespace XCollision.Core
     public class CubeXCollider : XCollider
     {
 
-        private Vector3 size;
+        public Vector3 Size { get; private set; }
 
         public CubeXCollider(Vector3 position, Vector3 size) : this(position, size, 0)
         {
@@ -15,26 +15,26 @@ namespace XCollision.Core
 
         public CubeXCollider(Vector3 position, Vector3 size, float rotation) : base(position, rotation)
         {
-            this.size = size;
+            Size = size;
             CalcBounds();
         }
 
         public override void CalcBounds()
         {
             bounds.Center = Vector3.zero;
-            bounds.Size = size;
-            var minY = -size.y / 2;
-            var maxY = size.y / 2;
+            bounds.Size = Size;
+            var minY = -Size.y / 2;
+            var maxY = Size.y / 2;
             var minX = float.MaxValue;
             var maxX = float.MinValue;
             var minZ = float.MaxValue;
             var maxZ = float.MinValue;
             var points = new Vector2[]
             {
-                new Vector2(size.x / 2, size.z / 2),
-                new Vector2(-size.x / 2, -size.z / 2),
-                new Vector2(-size.x / 2, size.z / 2),
-                new Vector2(size.x / 2, -size.z / 2)
+                new Vector2(Size.x / 2, Size.z / 2),
+                new Vector2(-Size.x / 2, -Size.z / 2),
+                new Vector2(-Size.x / 2, Size.z / 2),
+                new Vector2(Size.x / 2, -Size.z / 2)
             };
             // clockwise rotate, same with unity behavior
             var rotateU = new Vector2(Mathf.Cos(-Rotation), -Mathf.Sin(-Rotation));
@@ -55,20 +55,22 @@ namespace XCollision.Core
             bounds.Center = Position;
         }
 
-        public override void Intersects(XCollider other)
+        public override bool Intersects(XCollider other, out XContact? contact)
         {
             if (other is CubeXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (CubeXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (CubeXCollider)other, out contact);
             }
             if (other is CylinderXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other, out contact);
             }
             if (other is SphereXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (SphereXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (SphereXCollider)other, out contact);
             }
+            contact = null;
+            return false;
         }
     }
 }

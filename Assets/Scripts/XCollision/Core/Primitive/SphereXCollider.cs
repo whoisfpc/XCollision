@@ -4,34 +4,36 @@ namespace XCollision.Core
 {
     public class SphereXCollider : XCollider
     {
-        private float radius;
+        public float Radius { get; private set; }
 
         public SphereXCollider(Vector3 position, float radius) : base(position, 0)
         {
-            this.radius = radius;
+            Radius = radius;
             CalcBounds();
         }
 
         public override void CalcBounds()
         {
             bounds.Center = Position;
-            bounds.Extents = new Vector3(radius, radius, radius);
+            bounds.Extents = new Vector3(Radius, Radius, Radius);
         }
 
-        public override void Intersects(XCollider other)
+        public override bool Intersects(XCollider other, out XContact? contact)
         {
             if (other is CubeXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (CubeXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (CubeXCollider)other, out contact);
             }
             if (other is CylinderXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other, out contact);
             }
             if (other is SphereXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (SphereXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (SphereXCollider)other, out contact);
             }
+            contact = null;
+            return false;
         }
     }
 }

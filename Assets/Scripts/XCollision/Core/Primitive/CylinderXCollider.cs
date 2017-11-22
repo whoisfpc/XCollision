@@ -6,36 +6,38 @@ namespace XCollision.Core
 {
     public class CylinderXCollider : XCollider
     {
-        private float radius;
-        private float height;
+        public float Radius { get; private set; }
+        public float Height { get; private set; }
 
         public CylinderXCollider(Vector3 position, float radius, float height) : base(position, 0)
         {
-            this.radius = radius;
-            this.height = height;
+            Radius = radius;
+            Height = height;
             CalcBounds();
         }
 
         public override void CalcBounds()
         {
             bounds.Center = Position;
-            bounds.Extents = new Vector3(radius, height * 0.5f, radius);
+            bounds.Extents = new Vector3(Radius, Height * 0.5f, Radius);
         }
 
-        public override void Intersects(XCollider other)
+        public override bool Intersects(XCollider other, out XContact? contact)
         {
             if (other is CubeXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (CubeXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (CubeXCollider)other, out contact);
             }
             if (other is CylinderXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (CylinderXCollider)other, out contact);
             }
             if (other is SphereXCollider)
             {
-                ColliderIntersectHelper.Intersect(this, (SphereXCollider)other);
+                return ColliderIntersectHelper.Intersect(this, (SphereXCollider)other, out contact);
             }
+            contact = null;
+            return false;
         }
     }
 }

@@ -50,7 +50,7 @@ namespace XCollision.Core
 
         public abstract void CalcBounds();
 
-        public abstract void Intersects(XCollider other);
+        public abstract bool Intersects(XCollider other, out XContact? contact);
 
         public void AddForce(Vector3 force)
         {

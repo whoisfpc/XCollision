@@ -7,17 +7,18 @@ namespace XCollision.Core
         public float Mass
         {
             get { return mass; }
-            set { mass = value; inverseMass = 1 / mass; }
+            set { mass = value; InverseMass = mass == 0 ? 0 : 1 / mass; }
         }
+        public float InverseMass { get; private set; }
         public Vector3 position;
         public Vector3 velocity;
         private float mass = 1;
         private Vector3 totalForce;
-        private float inverseMass = 1;
 
         public XRigidbody(Vector3 position)
         {
             this.position = position;
+            InverseMass = 1;
         }
 
         public void AddForce(Vector3 force)
@@ -27,7 +28,7 @@ namespace XCollision.Core
 
         public void Update(float dt)
         {
-            var acc = totalForce * inverseMass;
+            var acc = totalForce * InverseMass;
             velocity += acc * dt;
             position += velocity * dt;
             totalForce = Vector3.zero;
