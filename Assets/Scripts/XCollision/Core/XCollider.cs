@@ -35,6 +35,7 @@ namespace XCollision.Core
 
         public XRigidbody rigidbody;
         public Bounds bounds;
+        public float restitution;
         private Vector3 position;
         private float rotation;
 
@@ -42,8 +43,9 @@ namespace XCollision.Core
         {
             this.position = position;
             this.rotation = rotation;
-            rigidbody = new XRigidbody();
+            rigidbody = new XRigidbody(position);
             bounds = new Bounds();
+            restitution = 0;
         }
 
         public abstract void CalcBounds();
@@ -57,9 +59,8 @@ namespace XCollision.Core
 
         public void Update(float dt)
         {
-            Position += rigidbody.velocity * dt;
-
             rigidbody.Update(dt);
+            bounds.Center = position = rigidbody.position;
         }
     }
 }
