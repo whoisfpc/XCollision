@@ -1,5 +1,6 @@
 ﻿using Vector3 = UnityEngine.Vector3;
 using Mathf = UnityEngine.Mathf;
+using Quaternion = UnityEngine.Quaternion;
 
 namespace XCollision.Core
 {
@@ -19,19 +20,70 @@ namespace XCollision.Core
 
         public static bool Intersect(CubeXCollider src, SphereXCollider dst, out XContact? contact)
         {
-            //TMP: 只判断和顶面是否相交, 没有处理边界
-            var topP = src.Position;
-            topP.y += src.Size.y * 0.5f;
-            var dist = Vector3.Dot(Vector3.up, dst.Position - topP);
-            if (dist < dst.Radius)
-            {
-                contact = new XContact(src, dst, Vector3.up, dst.Radius - dist);
-                return true;
-            }
-            // TMP: 球的半径在
-            if (dst.Position.y <= topP.y && dst.Position.y >= topP.y - src.Size.y)
-            {
+            // 反向旋转sphere的位置，使得可以在cube的坐标系下进行碰撞判断
+            var extents = src.Size * 0.5f;
+            var invQ = Quaternion.Inverse(src.Quaternion);
+            var invP = invQ * (dst.Position - src.Position);
 
+            // 以下所有操作都是在cube的坐标系下，随后的实际方向需要进行坐标系转换
+            var n = invP;
+            var closest = n;
+            closest.x = Mathf.Clamp(closest.x, -extents.x, extents.x);
+            closest.y = Mathf.Clamp(closest.y, -extents.y, extents.y);
+            closest.z = Mathf.Clamp(closest.z, -extents.z, extents.z);
+            var inside = false;
+
+            if (n == closest)
+            {
+                inside = true;
+                var disX = extents.x - Mathf.Abs(n.x);
+                var disY = extents.y - Mathf.Abs(n.y);
+                var disZ = extents.z - Mathf.Abs(n.z);
+                //找到最近的一个面
+                if (disX < disY && disX < disZ)
+                {
+                    // 沿X轴
+                    if (n.x > 0)
+                        closest.x = extents.x;
+                    else
+                        closest.x = -extents.x;
+                }
+                else if (disY < disX && disY < disZ)
+                {
+                    // 沿Y轴
+                    if (n.y > 0)
+                        closest.y = extents.y;
+                    else
+                        closest.y = -extents.y;
+                }
+                else
+                {
+                    // 沿Z轴
+                    if (n.z > 0)
+                        closest.z = extents.z;
+                    else
+                        closest.z = -extents.z;
+                }
+
+            }
+            var dir = n - closest;
+            var sqrDist = dir.sqrMagnitude;
+            var space = dst.Radius;
+            var sqrSpace = space * space;
+            if (sqrDist < sqrSpace || inside)
+            {
+                var dist = Mathf.Sqrt(sqrDist);
+                var normal = (src.Quaternion * dir).normalized;
+                var penetration = space - dist;
+                if (inside)
+                {
+                    normal = -normal;
+                    penetration = space + dist;
+                }
+                if (normal == Vector3.zero)
+                    normal = Vector3.up;
+                contact = new XContact(src, dst, normal, penetration);
+                return true;
             }
             contact = null;
             return false;

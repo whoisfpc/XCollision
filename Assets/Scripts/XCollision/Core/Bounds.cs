@@ -1,4 +1,5 @@
 ﻿using Vector3 = UnityEngine.Vector3;
+using Mathf = UnityEngine.Mathf;
 
 namespace XCollision.Core
 {
@@ -103,6 +104,16 @@ namespace XCollision.Core
             if (min.x > other.max.x || min.y > other.max.y || min.z > other.max.z)
                 return false;
             return true;
+        }
+
+        public Vector3 ClosestPoint(Vector3 point)
+        {
+            var closest = point - center;
+            closest.x = Mathf.Clamp(closest.x, -extents.x, extents.x);
+            closest.y = Mathf.Clamp(closest.y, -extents.y, extents.y);
+            closest.z = Mathf.Clamp(closest.z, -extents.z, extents.z);
+            closest += center;
+            return closest;
         }
     }
 }

@@ -16,6 +16,6 @@ public class SimpleController : MonoBehaviour
     {
         var h = Input.GetAxis("Horizontal");
         var v = Input.GetAxis("Vertical");
-        xrb.AddForce(new Vector2(h, v) * force);
+        xrb.AddForce(new Vector3(h, v) * force);
     }
 }
