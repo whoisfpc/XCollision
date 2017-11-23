@@ -18,7 +18,7 @@ namespace XCollision.Core
 
         public void AddCollider(XCollider collider)
         {
-            // TODO:使用队列，延迟加入
+            // TODO:使用队列，延迟加入。添加和删除碰撞体需要全部延迟到每次update前
             colliders.Add(collider);
         }
 
