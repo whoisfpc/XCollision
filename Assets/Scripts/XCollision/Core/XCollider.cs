@@ -1,4 +1,5 @@
 ﻿using Vector3 = UnityEngine.Vector3;
+using Quaternion = UnityEngine.Quaternion;
 
 namespace XCollision.Core
 {
@@ -16,6 +17,7 @@ namespace XCollision.Core
                 bounds.Center = position;
             }
         }
+        // Rotation around Y axis, degree
         public float Rotation
         {
             get
@@ -28,10 +30,12 @@ namespace XCollision.Core
                 rotation = value;
                 if (old != rotation)
                 {
+                    Quaternion = Quaternion.Euler(0, rotation, 0);
                     CalcBounds();
                 }
             }
         }
+        public Quaternion Quaternion { get; private set; }
 
         public XRigidbody rigidbody;
         public Bounds bounds;
@@ -43,6 +47,7 @@ namespace XCollision.Core
         {
             this.position = position;
             this.rotation = rotation;
+            Quaternion = Quaternion.Euler(0, rotation, 0);
             rigidbody = new XRigidbody(position);
             bounds = new Bounds();
             restitution = 0;

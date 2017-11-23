@@ -1,6 +1,7 @@
 ﻿using Vector3 = UnityEngine.Vector3;
 using Vector2 = UnityEngine.Vector2;
 using Mathf = UnityEngine.Mathf;
+using Quaternion = UnityEngine.Quaternion;
 
 namespace XCollision.Core
 {
@@ -29,26 +30,20 @@ namespace XCollision.Core
             var maxX = float.MinValue;
             var minZ = float.MaxValue;
             var maxZ = float.MinValue;
-            var points = new Vector2[]
+            var points = new Vector3[]
             {
-                new Vector2(Size.x / 2, Size.z / 2),
-                new Vector2(-Size.x / 2, -Size.z / 2),
-                new Vector2(-Size.x / 2, Size.z / 2),
-                new Vector2(Size.x / 2, -Size.z / 2)
+                new Vector3(Size.x / 2, 0, Size.z / 2),
+                new Vector3(-Size.x / 2, 0, -Size.z / 2),
+                new Vector3(-Size.x / 2, 0, Size.z / 2),
+                new Vector3(Size.x / 2, 0, -Size.z / 2)
             };
-            // clockwise rotate, same with unity behavior
-            var rotateU = new Vector2(Mathf.Cos(-Rotation), -Mathf.Sin(-Rotation));
-            var rotateV = new Vector2(Mathf.Sin(-Rotation), Mathf.Cos(-Rotation));
             for (int i = 0; i < points.Length; i++)
             {
-                points[i] = new Vector2(
-                    Vector2.Dot(rotateU, points[i]),
-                    Vector2.Dot(rotateV, points[i])
-                    );
+                points[i] = Quaternion * points[i];
                 minX = Mathf.Min(minX, points[i].x);
                 maxX = Mathf.Max(maxX, points[i].x);
-                minZ = Mathf.Min(minZ, points[i].y);
-                maxZ = Mathf.Max(maxZ, points[i].y);
+                minZ = Mathf.Min(minZ, points[i].z);
+                maxZ = Mathf.Max(maxZ, points[i].z);
             }
             bounds.Min = new Vector3(minX, minY, minZ);
             bounds.Max = new Vector3(maxX, maxY, maxZ);

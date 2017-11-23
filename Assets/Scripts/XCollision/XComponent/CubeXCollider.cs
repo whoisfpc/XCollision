@@ -8,7 +8,7 @@ namespace XCollision.XComponent
 
         protected override void Awake()
         {
-            col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y*Mathf.Deg2Rad);
+            col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y);
             col.restitution = restitution;
             col.rigidbody.Mass = mass;
             XPhysicsProxy.Instance.AddCollider(col);
@@ -17,7 +17,7 @@ namespace XCollision.XComponent
         protected override void Update()
         {
             base.Update();
-            col.Rotation = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
+            col.Rotation = transform.rotation.eulerAngles.y;
         }
 
         protected override void OnDrawGizmosSelected()

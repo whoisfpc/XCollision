@@ -19,16 +19,19 @@ namespace XCollision.Core
 
         public static bool Intersect(CubeXCollider src, SphereXCollider dst, out XContact? contact)
         {
-            //TMP: 只判断和顶面是否相交
+            //TMP: 只判断和顶面是否相交, 没有处理边界
             var topP = src.Position;
             topP.y += src.Size.y * 0.5f;
             var dist = Vector3.Dot(Vector3.up, dst.Position - topP);
-            var sqrDist = dist * dist;
-            var sqrSpace = dst.Radius * dst.Radius;
-            if (sqrDist < sqrSpace)
+            if (dist < dst.Radius)
             {
                 contact = new XContact(src, dst, Vector3.up, dst.Radius - dist);
                 return true;
+            }
+            // TMP: 球的半径在
+            if (dst.Position.y <= topP.y && dst.Position.y >= topP.y - src.Size.y)
+            {
+
             }
             contact = null;
             return false;
