@@ -5,11 +5,11 @@ namespace XCollision.XComponent
     public class CubeXCollider : XCollider
     {
         public Vector3 size;
-        public float mass;
 
         protected override void Awake()
         {
             col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y*Mathf.Deg2Rad);
+            col.restitution = restitution;
             col.rigidbody.Mass = mass;
             XPhysicsProxy.Instance.AddCollider(col);
         }

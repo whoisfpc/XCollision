@@ -35,7 +35,7 @@ namespace XCollision.Core
             for (int i = 0; i < colliders.Count; i++)
             {
                 if (useGravity)
-                    colliders[i].AddForce(gravity);
+                    colliders[i].AddForce(gravity * colliders[i].rigidbody.Mass);
                 colliders[i].Update(dt);
             }
 

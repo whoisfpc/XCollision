@@ -7,7 +7,14 @@ namespace XCollision.Core
         public float Mass
         {
             get { return mass; }
-            set { mass = value; InverseMass = mass == 0 ? 0 : 1 / mass; }
+            set
+            {
+                if (float.IsInfinity(value))
+                    mass = 0;
+                else
+                    mass = value;
+                InverseMass = mass == 0 ? 0 : 1 / mass;
+            }
         }
         public float InverseMass { get; private set; }
         public Vector3 position;

@@ -63,6 +63,14 @@ namespace XCollision.Core
 
         public static bool Intersect(SphereXCollider src, SphereXCollider dst, out XContact? contact)
         {
+            var sqrDist = (src.Position - dst.Position).sqrMagnitude;
+            var sqrSpace = (src.Radius + dst.Radius);
+            sqrSpace *= sqrSpace;
+            if (sqrDist < sqrSpace)
+            {
+                contact = new XContact(src, dst, (dst.Position-src.Position).normalized, Mathf.Sqrt(sqrSpace)-Mathf.Sqrt(sqrDist));
+                return true;
+            }
             contact = null;
             return false;
         }

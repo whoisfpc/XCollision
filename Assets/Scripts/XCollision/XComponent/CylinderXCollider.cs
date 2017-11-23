@@ -10,6 +10,8 @@ namespace XCollision.XComponent
         protected override void Awake()
         {
             col = new Core.CylinderXCollider(transform.position, radius, height);
+            col.restitution = restitution;
+            col.rigidbody.Mass = mass;
             XPhysicsProxy.Instance.AddCollider(col);
         }
 

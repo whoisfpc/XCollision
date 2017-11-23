@@ -8,6 +8,9 @@ namespace XCollision.XComponent
         public static Color boundsColor = Color.yellow;
 
         public bool showBounds;
+        [Range(0, 1)]
+        public float restitution;
+        public float mass = 1;
         protected Core.XCollider col;
 
         public Core.XRigidbody XRigidbody
