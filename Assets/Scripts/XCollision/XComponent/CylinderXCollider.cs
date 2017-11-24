@@ -12,7 +12,7 @@ namespace XCollision.XComponent
             col = new Core.CylinderXCollider(transform.position, radius, height);
             col.restitution = restitution;
             col.rigidbody.Mass = mass;
-            XPhysicsProxy.Instance.AddCollider(col);
+            XPhysicsProxy.XPhysics.AddCollider(col);
         }
 
         protected override void Update()
@@ -20,14 +20,17 @@ namespace XCollision.XComponent
             base.Update();
         }
 
-        protected override void OnDrawGizmosSelected()
+        protected override void DisplayBounds()
         {
-            GizmosHelper.DrawCylinder(transform.position, radius, height, colliderColor);
-
-            if (showBounds && col != null)
+            if (col != null)
             {
                 GizmosHelper.DrawWireCube(col.bounds.Center, col.bounds.Size, boundsColor);
             }
+        }
+
+        protected override void DisplayCollider()
+        {
+            GizmosHelper.DrawCylinder(transform.position, radius, height, colliderColor);
         }
     }
 }

@@ -29,9 +29,32 @@ namespace XCollision.XComponent
                 transform.position = col.Position;
         }
 
-        protected virtual void OnDrawGizmosSelected()
+        private void OnDrawGizmosSelected()
         {
-            
+            DisplayCollider();
+            if (showBounds)
+            {
+                DisplayBounds();
+            }
         }
+
+        private void OnDrawGizmos()
+        {
+            if (XPhysicsProxy.Instance == null)
+                return;
+
+            if (XPhysicsProxy.Instance.alwaysShowBounds)
+            {
+                DisplayBounds();
+            }
+
+            if (XPhysicsProxy.Instance.alwaysShowCollider)
+            {
+                DisplayCollider();
+            }
+        }
+
+        protected abstract void DisplayBounds();
+        protected abstract void DisplayCollider();
     }
 }

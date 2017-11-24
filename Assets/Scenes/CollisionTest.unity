@@ -6876,6 +6876,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb1bce90934c694cba8401dc40eecab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  alwaysShowBounds: 1
+  alwaysShowCollider: 1
   useGravity: 0
 --- !u!4 &2055470014
 Transform:

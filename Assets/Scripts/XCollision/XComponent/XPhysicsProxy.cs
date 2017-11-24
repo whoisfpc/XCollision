@@ -3,38 +3,44 @@ using XCollision.Core;
 
 namespace XCollision.XComponent
 {
+    [ExecuteInEditMode]
     public class XPhysicsProxy : MonoBehaviour
     {
-        public static XPhysics Instance
+        public static XPhysics XPhysics
         {
             get
             {
-                if (instance == null)
-                    instance = new XPhysics();
-                return instance;
+                if (xPhysics == null)
+                    xPhysics = new XPhysics();
+                return xPhysics;
             }
         }
+
+        public static XPhysicsProxy Instance { get; private set; }
+        public bool alwaysShowBounds = true;
+        public bool alwaysShowCollider = true;
         public bool useGravity;
-        private static XPhysics instance;
+        private static XPhysics xPhysics;
         private float lastFixTime;
 
         private void Awake()
         {
-            if (instance == null)
-                instance = new XPhysics();
-            instance.useGravity = useGravity;
+            Instance = this;
+            if (xPhysics == null)
+                xPhysics = new XPhysics();
+            xPhysics.useGravity = useGravity;
             lastFixTime = Time.time;
         }
 
         private void Update()
         {
-            instance.useGravity = useGravity;
+            xPhysics.useGravity = useGravity;
         }
 
         private void FixedUpdate()
         {
             var time = Time.fixedTime;
-            Instance.Update(time - lastFixTime);
+            XPhysics.Update(time - lastFixTime);
             lastFixTime = time;
         }
     }

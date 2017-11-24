@@ -11,7 +11,7 @@ namespace XCollision.XComponent
             col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y);
             col.restitution = restitution;
             col.rigidbody.Mass = mass;
-            XPhysicsProxy.Instance.AddCollider(col);
+            XPhysicsProxy.XPhysics.AddCollider(col);
         }
 
         protected override void Update()
@@ -20,13 +20,17 @@ namespace XCollision.XComponent
             col.Rotation = transform.rotation.eulerAngles.y;
         }
 
-        protected override void OnDrawGizmosSelected()
+        protected override void DisplayBounds()
         {
-            GizmosHelper.DrawWireCube(transform.position, size, Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0), colliderColor);
-            if (showBounds && col != null)
+            if (col != null)
             {
                 GizmosHelper.DrawWireCube(col.bounds.Center, col.bounds.Size, boundsColor);
             }
+        }
+
+        protected override void DisplayCollider()
+        {
+            GizmosHelper.DrawWireCube(transform.position, size, Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0), colliderColor);
         }
     }
 }

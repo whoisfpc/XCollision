@@ -11,16 +11,20 @@ namespace XCollision.XComponent
             col = new Core.SphereXCollider(transform.position, radius);
             col.restitution = restitution;
             col.rigidbody.Mass = mass;
-            XPhysicsProxy.Instance.AddCollider(col);
+            XPhysicsProxy.XPhysics.AddCollider(col);
         }
 
-        protected override void OnDrawGizmosSelected()
+        protected override void DisplayBounds()
         {
-            GizmosHelper.DrawShpere(transform.position, radius, colliderColor);
-            if (showBounds && col != null)
+            if (col != null)
             {
                 GizmosHelper.DrawWireCube(col.bounds.Center, col.bounds.Size, boundsColor);
             }
+        }
+
+        protected override void DisplayCollider()
+        {
+            GizmosHelper.DrawShpere(transform.position, radius, colliderColor);
         }
     }
 }
