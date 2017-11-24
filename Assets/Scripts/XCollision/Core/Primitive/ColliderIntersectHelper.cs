@@ -15,8 +15,98 @@ namespace XCollision.Core
 
         public static bool Intersect(CubeXCollider src, CylinderXCollider dst, out XContact? contact)
         {
-            contact = null;
-            return false;
+            var invP = Quaternion.Inverse(src.Quaternion) * (dst.Position - src.Position);
+            Vector3 n = Vector3.zero;
+            n.x = invP.x;
+            n.z = invP.z;
+
+            var extents = src.Size * 0.5f;
+            var halfHa = extents.y;
+            var topA = src.Position.y + halfHa;
+            var bottomA = src.Position.y - halfHa;
+            var halfHb = dst.Height * 0.5f;
+            var topB = invP.y + halfHb;
+            var bottomB = invP.y - halfHb;
+
+            var space = dst.Radius;
+            var sqrSpace = space * space;
+
+            // 相撞时，俯视图下的圆和矩形必然相交
+            var closest = n;
+            closest.x = Mathf.Clamp(closest.x, -extents.x, extents.x);
+            closest.z = Mathf.Clamp(closest.z, -extents.z, extents.z);
+
+            if ((n-closest).sqrMagnitude > sqrSpace)
+            {
+                contact = null;
+                return false;
+            }
+
+            // 处理相交的情况
+            Vector3 normal;
+            float penetration;
+            float verticalP = float.PositiveInfinity;
+            float horizontalP;
+
+            var inside = false;
+            if (n == closest)
+            {
+                inside = true;
+                var disX = extents.x - Mathf.Abs(n.x);
+                var disZ = extents.z - Mathf.Abs(n.z);
+                //找到最近的一个面
+                if (disX < disZ)
+                {
+                    // 沿X轴
+                    if (n.x > 0)
+                        closest.x = extents.x;
+                    else
+                        closest.x = -extents.x;
+                }
+                else
+                {
+                    // 沿Z轴
+                    if (n.z > 0)
+                        closest.z = extents.z;
+                    else
+                        closest.z = -extents.z;
+                }
+                horizontalP = space + (n - closest).magnitude;
+            }
+            else
+            {
+                horizontalP = space - (n - closest).magnitude;
+            }
+
+            if (Mathf.Sign(topA - topB) != Mathf.Sign(bottomB - bottomA))
+            {
+                // 斜向相撞
+                if (topB > topA)
+                {
+                    verticalP = topA - bottomB;
+                }
+                else
+                {
+                    verticalP = topB - bottomA;
+                }
+            }
+
+            if (horizontalP < verticalP)
+            {
+                normal = (src.Quaternion * (n-closest)).normalized;
+                if (inside)
+                    normal = -normal;
+                penetration = horizontalP;
+            }
+            else
+            {
+                normal = topB > topA ? Vector3.up : Vector3.down;
+                penetration = verticalP;
+            }
+            if (normal == Vector3.zero)
+                normal = Vector3.up;
+            contact = new XContact(src, dst, normal, penetration);
+            return true;
         }
 
         public static bool Intersect(CubeXCollider src, SphereXCollider dst, out XContact? contact)
@@ -95,6 +185,7 @@ namespace XCollision.Core
             return Intersect(dst, src, out contact);
         }
 
+        // 没有处理在内部的情况
         public static bool Intersect(CylinderXCollider src, CylinderXCollider dst, out XContact? contact)
         {
             var space = src.Radius + dst.Radius;
@@ -164,6 +255,8 @@ namespace XCollision.Core
                     penetration = verticalP;
                 }
             }
+            if (normal == Vector3.zero)
+                normal = Vector3.up;
             contact = new XContact(src, dst, normal, penetration);
             return true;
         }
