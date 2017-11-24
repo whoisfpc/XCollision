@@ -70,7 +70,7 @@ namespace XCollision.Core
             float sv = Vector3.Dot((b.rigidbody.velocity - a.rigidbody.velocity), normal);
             if (sv > 0)
                 return;
-            float e = Mathf.Min(a.restitution, b.restitution);
+            float e = (a.restitution + b.restitution) * 0.5f;
             float impulse = -(1 + e) * sv / (a.rigidbody.InverseMass + b.rigidbody.InverseMass);
             a.rigidbody.velocity -= impulse * a.rigidbody.InverseMass * normal;
             b.rigidbody.velocity += impulse * b.rigidbody.InverseMass * normal;

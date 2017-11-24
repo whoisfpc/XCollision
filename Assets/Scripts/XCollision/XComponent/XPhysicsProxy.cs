@@ -3,7 +3,6 @@ using XCollision.Core;
 
 namespace XCollision.XComponent
 {
-    [ExecuteInEditMode]
     public class XPhysicsProxy : MonoBehaviour
     {
         public static XPhysics XPhysics

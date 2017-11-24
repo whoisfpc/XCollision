@@ -1,4 +1,5 @@
 ﻿using Vector3 = UnityEngine.Vector3;
+using Vector2 = UnityEngine.Vector2;
 using Mathf = UnityEngine.Mathf;
 using Quaternion = UnityEngine.Quaternion;
 
@@ -102,6 +103,63 @@ namespace XCollision.Core
 
         public static bool Intersect(CylinderXCollider src, SphereXCollider dst, out XContact? contact)
         {
+            var n = dst.Position - src.Position;
+
+            Vector3 closest = n;
+            var extents = src.bounds.Extents;
+            closest.x = Mathf.Clamp(closest.x, -extents.x, extents.x);
+            closest.y = Mathf.Clamp(closest.y, -extents.y, extents.y);
+            closest.z = Mathf.Clamp(closest.z, -extents.z, extents.z);
+
+            var v = new Vector2(closest.x, closest.z);
+            if (v.sqrMagnitude > src.Radius * src.Radius)
+            {
+                v = v.normalized * src.Radius;
+                closest.x = v.x;
+                closest.z = v.y;
+            }
+
+            bool inside = false;
+
+            if (n == closest)
+            {
+                inside = true;
+                // 往上下移动的最短距离
+                var dist1 = extents.y - Mathf.Abs(closest.y);
+                // 往水平四周移动的最短距离
+                var dist2 = src.Radius - v.magnitude;
+                
+                if (dist1 < dist2)
+                {
+                    closest.y = closest.y > 0 ? extents.y : -extents.y;
+                }
+                else
+                {
+                    v = v.normalized * src.Radius;
+                    closest.x = v.x;
+                    closest.z = v.y;
+                }
+            }
+
+            var dir = n - closest;
+            var sqrDist = dir.sqrMagnitude;
+            var space = dst.Radius;
+            var sqrSpace = space * space;
+            if (sqrDist < sqrSpace || inside)
+            {
+                var dist = Mathf.Sqrt(sqrDist);
+                var normal = dir.normalized;
+                var penetration = space - dist;
+                if (inside)
+                {
+                    normal = -normal;
+                    penetration = space + dist;
+                }
+                if (normal == Vector3.zero)
+                    normal = Vector3.up;
+                contact = new XContact(src, dst, normal, penetration);
+                return true;
+            }
             contact = null;
             return false;
         }

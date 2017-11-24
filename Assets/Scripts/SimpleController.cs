@@ -5,6 +5,7 @@ public class SimpleController : MonoBehaviour
 {
 
     public float force = 10f;
+    public bool moveOnXZ = false;
     private XCollision.Core.XRigidbody xrb;
 
     private void Start()
@@ -16,6 +17,9 @@ public class SimpleController : MonoBehaviour
     {
         var h = Input.GetAxis("Horizontal");
         var v = Input.GetAxis("Vertical");
-        xrb.AddForce(new Vector3(h, v) * force);
+        if (moveOnXZ)
+            xrb.AddForce(new Vector3(h, 0, v) * force);
+        else
+            xrb.AddForce(new Vector2(h, v) * force);
     }
 }
