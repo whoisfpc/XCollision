@@ -12,7 +12,7 @@ namespace XCollision.Core
         public Vector3 gravity = Vector3.down * 9.8f;
         public bool useGravity = true;
 
-        // TODO: 改用linklist
+        // TODO: 改用linklist，区分静态和动态物体
         private IList<XCollider> colliders = new List<XCollider>();
         private List<XContact> tmpContacts = new List<XContact>();
 
@@ -71,7 +71,12 @@ namespace XCollision.Core
             if (sv > 0)
                 return;
             float e = (a.restitution + b.restitution) * 0.5f;
-            float impulse = -(1 + e) * sv / (a.rigidbody.InverseMass + b.rigidbody.InverseMass);
+            var tm = a.rigidbody.InverseMass + b.rigidbody.InverseMass;
+            if (tm == 0)
+            {
+                return;
+            }
+            float impulse = -(1 + e) * sv / tm;
             a.rigidbody.velocity -= impulse * a.rigidbody.InverseMass * normal;
             b.rigidbody.velocity += impulse * b.rigidbody.InverseMass * normal;
 
@@ -82,9 +87,14 @@ namespace XCollision.Core
         {
             var a = contact.src;
             var b = contact.dst;
+            var tm = a.rigidbody.InverseMass + b.rigidbody.InverseMass;
+            if (tm == 0)
+            {
+                return;
+            }
             float percent = 0.2f;
             float slop = 0.01f;
-            Vector3 correction = Mathf.Max(contact.penetration - slop, 0) / (a.rigidbody.InverseMass + b.rigidbody.InverseMass) * percent * contact.normal;
+            Vector3 correction = Mathf.Max(contact.penetration - slop, 0) / tm * percent * contact.normal;
             a.Position = a.rigidbody.position -= a.rigidbody.InverseMass * correction;
             b.Position = b.rigidbody.position += b.rigidbody.InverseMass * correction;
         }
