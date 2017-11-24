@@ -97,8 +97,75 @@ namespace XCollision.Core
 
         public static bool Intersect(CylinderXCollider src, CylinderXCollider dst, out XContact? contact)
         {
-            contact = null;
-            return false;
+            var space = src.Radius + dst.Radius;
+            var sqrSpace = space * space;
+            Vector3 n = Vector3.zero;
+            n.x = dst.Position.x - src.Position.x;
+            n.z = dst.Position.z - src.Position.z;
+            if (n.sqrMagnitude > sqrSpace)
+            {
+                contact = null;
+                return false;
+            }
+
+            var halfHa = src.Height * 0.5f;
+            var topA = src.Position.y + halfHa;
+            var bottomA = src.Position.y - halfHa;
+            var halfHb = dst.Height * 0.5f;
+            var topB = dst.Position.y + halfHb;
+            var bottomB = dst.Position.y - halfHb;
+
+            Vector3 normal;
+            float penetration;
+
+            if (Mathf.Sign(topA-topB) == Mathf.Sign(bottomB-bottomA))
+            {
+                // 水平相撞
+                normal = n.normalized;
+                penetration = space - n.magnitude;
+                
+            }
+            else if (n.sqrMagnitude < Mathf.Pow(dst.Radius-src.Radius, 2f))
+            {
+                // 垂直相撞
+                if (dst.Position.y > src.Position.y)
+                {
+                    normal = Vector3.up;
+                    penetration = topA - bottomB;
+                }
+                else
+                {
+                    normal = Vector3.down;
+                    penetration = topB - bottomA;
+                }
+            }
+            else
+            {
+                var horizontalP = space - n.magnitude;
+                float verticalP;
+                // 斜向相撞
+                if (topB > topA)
+                {
+                    verticalP = topA - bottomB;
+                }
+                else
+                {
+                    verticalP = topB - bottomA;
+                }
+
+                if (horizontalP < verticalP)
+                {
+                    normal = n.normalized;
+                    penetration = horizontalP;
+                }
+                else
+                {
+                    normal = topB > topA ? Vector3.up : Vector3.down;
+                    penetration = verticalP;
+                }
+            }
+            contact = new XContact(src, dst, normal, penetration);
+            return true;
         }
 
         public static bool Intersect(CylinderXCollider src, SphereXCollider dst, out XContact? contact)
