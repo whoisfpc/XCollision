@@ -7088,7 +7088,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showBounds: 0
-  restitution: 0.3
+  restitution: 1
   mass: Infinity
   radius: 1
   height: 2

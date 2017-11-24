@@ -6,7 +6,7 @@ namespace XCollision.Core
     /// <summary>
     /// AABB(axis-aligned bounding box) for pre collision detect
     /// </summary>
-    public class Bounds
+    public struct Bounds
     {
         public Vector3 Center
         {
@@ -83,10 +83,6 @@ namespace XCollision.Core
         private Vector3 max;
         private Vector3 min;
         private Vector3 size;
-
-        public Bounds() : this(Vector3.zero, Vector3.zero)
-        {
-        }
 
         public Bounds(Vector3 center, Vector3 size)
         {

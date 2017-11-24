@@ -49,7 +49,7 @@ namespace XCollision.Core
             this.rotation = rotation;
             Quaternion = Quaternion.Euler(0, rotation, 0);
             rigidbody = new XRigidbody(position);
-            bounds = new Bounds();
+            bounds = new Bounds(Vector3.zero, Vector3.zero);
             restitution = 0;
         }
 
