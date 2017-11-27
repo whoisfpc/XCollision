@@ -11,6 +11,7 @@ namespace XCollision.XComponent
         [Range(0, 1)]
         public float restitution;
         public float mass = 1;
+        public bool isStatic = false;
         protected Core.XCollider col;
 
         public Core.XRigidbody XRigidbody

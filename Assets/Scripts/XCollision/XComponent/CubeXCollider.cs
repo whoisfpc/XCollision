@@ -8,7 +8,7 @@ namespace XCollision.XComponent
 
         protected override void Awake()
         {
-            col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y);
+            col = new Core.CubeXCollider(transform.position, size, transform.rotation.eulerAngles.y, isStatic);
             col.restitution = restitution;
             col.rigidbody.Mass = mass;
             XPhysicsProxy.XPhysics.AddCollider(col);

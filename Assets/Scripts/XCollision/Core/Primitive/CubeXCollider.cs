@@ -10,11 +10,11 @@ namespace XCollision.Core
 
         public Vector3 Size { get; private set; }
 
-        public CubeXCollider(Vector3 position, Vector3 size) : this(position, size, 0)
+        public CubeXCollider(Vector3 position, Vector3 size, bool isStatic = false) : this(position, size, 0, isStatic)
         {
         }
 
-        public CubeXCollider(Vector3 position, Vector3 size, float rotation) : base(position, rotation)
+        public CubeXCollider(Vector3 position, Vector3 size, float rotation, bool isStatic = false) : base(position, rotation, isStatic)
         {
             Size = size;
             CalcBounds();

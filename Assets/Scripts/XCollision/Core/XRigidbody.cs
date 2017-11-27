@@ -9,7 +9,7 @@ namespace XCollision.Core
             get { return mass; }
             set
             {
-                if (float.IsInfinity(value))
+                if (float.IsInfinity(value) || IsStatic)
                     mass = 0;
                 else
                     mass = value;
@@ -17,15 +17,25 @@ namespace XCollision.Core
             }
         }
         public float InverseMass { get; private set; }
+        public bool IsStatic { get; private set; }
+
         public Vector3 position;
         public Vector3 velocity;
         private float mass = 1;
         private Vector3 totalForce;
 
-        public XRigidbody(Vector3 position)
+        public XRigidbody(Vector3 position, bool isStatic = false)
         {
             this.position = position;
-            InverseMass = 1;
+            IsStatic = isStatic;
+            if (IsStatic)
+            {
+                InverseMass = 0;
+            }
+            else
+            {
+                InverseMass = 1;
+            }
         }
 
         public void AddForce(Vector3 force)

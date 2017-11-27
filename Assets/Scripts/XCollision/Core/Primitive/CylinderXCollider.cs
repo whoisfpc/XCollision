@@ -9,7 +9,7 @@ namespace XCollision.Core
         public float Radius { get; private set; }
         public float Height { get; private set; }
 
-        public CylinderXCollider(Vector3 position, float radius, float height) : base(position, 0)
+        public CylinderXCollider(Vector3 position, float radius, float height, bool isStatic = false) : base(position, 0, isStatic)
         {
             Radius = radius;
             Height = height;

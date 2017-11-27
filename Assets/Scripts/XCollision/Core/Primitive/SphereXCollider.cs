@@ -6,7 +6,7 @@ namespace XCollision.Core
     {
         public float Radius { get; private set; }
 
-        public SphereXCollider(Vector3 position, float radius) : base(position, 0)
+        public SphereXCollider(Vector3 position, float radius, bool isStatic = false) : base(position, 0, isStatic)
         {
             Radius = radius;
             CalcBounds();

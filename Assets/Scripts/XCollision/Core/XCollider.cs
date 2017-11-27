@@ -43,12 +43,12 @@ namespace XCollision.Core
         private Vector3 position;
         private float rotation;
 
-        public XCollider(Vector3 position, float rotation)
+        public XCollider(Vector3 position, float rotation, bool isStatic = false)
         {
             this.position = position;
             this.rotation = rotation;
             Quaternion = Quaternion.Euler(0, rotation, 0);
-            rigidbody = new XRigidbody(position);
+            rigidbody = new XRigidbody(position, isStatic);
             bounds = new Bounds(Vector3.zero, Vector3.zero);
             restitution = 0;
         }
