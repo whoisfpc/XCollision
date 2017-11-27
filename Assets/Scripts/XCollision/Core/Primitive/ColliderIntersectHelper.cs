@@ -9,8 +9,125 @@ namespace XCollision.Core
     {
         public static bool Intersect(CubeXCollider src, CubeXCollider dst, out XContact? contact)
         {
-            contact = null;
-            return false;
+            var srcExtents = src.Size * 0.5f;
+            var dstExtents = dst.Size * 0.5f;
+
+            var invQ = Quaternion.Inverse(src.Quaternion);
+            var srcPoints = new Vector3[4];
+            srcPoints[0] = new Vector3(-srcExtents.x, 0, srcExtents.z);
+            srcPoints[1] = new Vector3(srcExtents.x, 0, srcExtents.z);
+            srcPoints[2] = new Vector3(srcExtents.x, 0, -srcExtents.z);
+            srcPoints[3] = new Vector3(-srcExtents.x, 0, -srcExtents.z);
+
+            var invPoints = new Vector3[4];
+            invPoints[0] = dst.Position + dst.Quaternion * new Vector3(-dstExtents.x, 0, dstExtents.z) - src.Position;
+            invPoints[1] = dst.Position + dst.Quaternion * new Vector3(dstExtents.x, 0, dstExtents.z) - src.Position;
+            invPoints[2] = dst.Position + dst.Quaternion * new Vector3(dstExtents.x, 0, -dstExtents.z) - src.Position;
+            invPoints[3] = dst.Position + dst.Quaternion * new Vector3(-dstExtents.x, 0, -dstExtents.z) - src.Position;
+            invPoints[0].y = invPoints[1].y = invPoints[2].y = invPoints[3].y = 0;
+            invPoints[0] = invQ * invPoints[0];
+            invPoints[1] = invQ * invPoints[1];
+            invPoints[2] = invQ * invPoints[2];
+            invPoints[3] = invQ * invPoints[3];
+
+
+            // SAT test
+            var minXa = srcPoints[0].x;
+            var maxXa = srcPoints[0].x;
+            var minZa = srcPoints[0].z;
+            var maxZa = srcPoints[0].z;
+            for (int i = 1; i < srcPoints.Length; i++)
+            {
+                minXa = Mathf.Min(minXa, srcPoints[i].x);
+                maxXa = Mathf.Max(maxXa, srcPoints[i].x);
+                minZa = Mathf.Min(minZa, srcPoints[i].z);
+                maxZa = Mathf.Max(maxZa, srcPoints[i].z);
+            }
+
+            var minXb = invPoints[0].x;
+            var maxXb = invPoints[0].x;
+            var minZb = invPoints[0].z;
+            var maxZb = invPoints[0].z;
+            for (int i = 1; i < invPoints.Length; i++)
+            {
+                minXb = Mathf.Min(minXb, invPoints[i].x);
+                maxXb = Mathf.Max(maxXb, invPoints[i].x);
+                minZb = Mathf.Min(minZb, invPoints[i].z);
+                maxZb = Mathf.Max(maxZb, invPoints[i].z);
+            }
+
+            if (maxXa <= minXb || minXa >= maxXb || maxZa <= minZb || minZa >= maxZb)
+            {
+                contact = null;
+                return false;
+            }
+            // 为解决在内部问题
+            var minYa = -srcExtents.y;
+            var maxYa = srcExtents.y;
+            var minYb = -dstExtents.y + dst.Position.y - src.Position.y;
+            var maxYb = dstExtents.y + dst.Position.y - src.Position.y;
+            float leastPenetration = float.MaxValue;
+            Vector3 normal = Vector3.up;
+            // Y axis
+            if (minYb < maxYa && minYb > minYa && maxYb > maxYa)
+            {
+                var penetration = maxYa - minYb;
+                if (penetration < leastPenetration)
+                {
+                    leastPenetration = penetration;
+                    normal = Vector3.up;
+                }
+            }
+            else if (maxYb > minYa && maxYb < maxYa && minYb < minYa)
+            {
+                var penetration = maxYb - minYa;
+                if (penetration < leastPenetration)
+                {
+                    leastPenetration = penetration;
+                    normal = Vector3.down;
+                }
+            }
+            // X axis
+            if (minXb < maxXa && minXb > minXa && maxXb > maxXa)
+            {
+                var penetration = maxXa - minXb;
+                if (penetration < leastPenetration)
+                {
+                    leastPenetration = penetration;
+                    normal = Vector3.right;
+                }
+            }
+            else if (maxXb > minXa && maxXb < maxXa && minXb < minXa)
+            {
+                var penetration = maxXb - minXa;
+                if (penetration < leastPenetration)
+                {
+                    leastPenetration = penetration;
+                    normal = Vector3.left;
+                }
+            }
+            // Z axis
+            if (minZb < maxZa && minZb > minZa && maxZb > maxZa)
+            {
+                var penetration = maxZa - minZb;
+                if (penetration < leastPenetration)
+                {
+                    leastPenetration = penetration;
+                    normal = Vector3.forward;
+                }
+            }
+            else if (maxZb > minZa && maxZb < maxZa && minZb < minZa)
+            {
+                var penetration = maxZb - minZa;
+                if (penetration < leastPenetration)
+                {
+                    leastPenetration = penetration;
+                    normal = Vector3.back;
+                }
+            }
+
+            contact = new XContact(src, dst, src.Quaternion * normal, leastPenetration);
+            return true;
         }
 
         public static bool Intersect(CubeXCollider src, CylinderXCollider dst, out XContact? contact)
