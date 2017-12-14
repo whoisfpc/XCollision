@@ -151,8 +151,8 @@ namespace XCollision.Core
 
             var extents = src.Size * 0.5f;
             var halfHa = extents.y;
-            var topA = src.Position.y + halfHa;
-            var bottomA = src.Position.y - halfHa;
+            var topA = halfHa;
+            var bottomA = -halfHa;
             var halfHb = dst.Height * 0.5f;
             var topB = invP.y + halfHb;
             var bottomB = invP.y - halfHb;
