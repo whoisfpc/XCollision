@@ -2,131 +2,143 @@
 using Vector2 = UnityEngine.Vector2;
 using Mathf = UnityEngine.Mathf;
 using Quaternion = UnityEngine.Quaternion;
+using Debug = UnityEngine.Debug;
 
 namespace XCollision.Core
 {
     public static class ColliderIntersectHelper
     {
-        public static bool Intersect(CubeXCollider src, CubeXCollider dst, out XContact? contact)
+        private static bool ProjectOverlapTest(Vector3 axis, Vector3[] srcPoints, Vector3[] dstPoints, out float overlap)
         {
+            float srcMin = float.MaxValue;
+            float dstMin = float.MaxValue;
+            float srcMax = float.MinValue;
+            float dstMax = float.MinValue;
+
+            for (int i = 0; i < srcPoints.Length; i++)
+            {
+                var p = Vector3.Dot(axis, srcPoints[i]);
+                if (p < srcMin)
+                    srcMin = p;
+                if (p > srcMax)
+                    srcMax = p;
+            }
+            for (int i = 0; i < dstPoints.Length; i++)
+            {
+                var p = Vector3.Dot(axis, dstPoints[i]);
+                if (p < dstMin)
+                    dstMin = p;
+                if (p > dstMax)
+                    dstMax = p;
+            }
+            if (srcMax < dstMin ||srcMin > dstMax)
+            {
+                overlap = 0;
+                return false;
+            }
+            overlap = Mathf.Min(srcMax, dstMax) - Mathf.Max(srcMin, dstMin);
+            if ((srcMax > dstMax && srcMin < dstMin) || (srcMax < dstMax && srcMin > dstMin))
+            {
+                var min = Mathf.Abs(srcMin - dstMin);
+                var max = Mathf.Abs(srcMax - dstMax);
+                overlap += Mathf.Min(min, max);
+            }
+            return true;
+        }
+
+        private static bool SATTest(CubeXCollider src, CubeXCollider dst, out Vector3 normal, out float penetration)
+        {
+            var srcPoints = new Vector3[4];
+            var dstPoints = new Vector3[4];
             var srcExtents = src.Size * 0.5f;
             var dstExtents = dst.Size * 0.5f;
-
-            var invQ = Quaternion.Inverse(src.Quaternion);
-            var srcPoints = new Vector3[4];
             srcPoints[0] = new Vector3(-srcExtents.x, 0, srcExtents.z);
             srcPoints[1] = new Vector3(srcExtents.x, 0, srcExtents.z);
             srcPoints[2] = new Vector3(srcExtents.x, 0, -srcExtents.z);
             srcPoints[3] = new Vector3(-srcExtents.x, 0, -srcExtents.z);
+            srcPoints[0] = src.Quaternion * srcPoints[0] + src.Position;
+            srcPoints[1] = src.Quaternion * srcPoints[1] + src.Position;
+            srcPoints[2] = src.Quaternion * srcPoints[2] + src.Position;
+            srcPoints[3] = src.Quaternion * srcPoints[3] + src.Position;
+            srcPoints[0].y = srcPoints[1].y = srcPoints[2].y = srcPoints[3].y = 0;
 
-            var invPoints = new Vector3[4];
-            invPoints[0] = dst.Position + dst.Quaternion * new Vector3(-dstExtents.x, 0, dstExtents.z) - src.Position;
-            invPoints[1] = dst.Position + dst.Quaternion * new Vector3(dstExtents.x, 0, dstExtents.z) - src.Position;
-            invPoints[2] = dst.Position + dst.Quaternion * new Vector3(dstExtents.x, 0, -dstExtents.z) - src.Position;
-            invPoints[3] = dst.Position + dst.Quaternion * new Vector3(-dstExtents.x, 0, -dstExtents.z) - src.Position;
-            invPoints[0].y = invPoints[1].y = invPoints[2].y = invPoints[3].y = 0;
-            invPoints[0] = invQ * invPoints[0];
-            invPoints[1] = invQ * invPoints[1];
-            invPoints[2] = invQ * invPoints[2];
-            invPoints[3] = invQ * invPoints[3];
+            dstPoints[0] = new Vector3(-dstExtents.x, 0, dstExtents.z);
+            dstPoints[1] = new Vector3(dstExtents.x, 0, dstExtents.z);
+            dstPoints[2] = new Vector3(dstExtents.x, 0, -dstExtents.z);
+            dstPoints[3] = new Vector3(-dstExtents.x, 0, -dstExtents.z);
+            dstPoints[0] = dst.Quaternion * dstPoints[0] + dst.Position;
+            dstPoints[1] = dst.Quaternion * dstPoints[1] + dst.Position;
+            dstPoints[2] = dst.Quaternion * dstPoints[2] + dst.Position;
+            dstPoints[3] = dst.Quaternion * dstPoints[3] + dst.Position;
+            dstPoints[0].y = dstPoints[1].y = dstPoints[2].y = dstPoints[3].y = 0;
 
+            var axis = new Vector3[4];
+            axis[0] = src.Quaternion * Vector3.forward;
+            axis[1] = src.Quaternion * Vector3.right;
+            axis[2] = dst.Quaternion * Vector3.forward;
+            axis[3] = dst.Quaternion * Vector3.right;
 
-            // SAT test
-            var minXa = srcPoints[0].x;
-            var maxXa = srcPoints[0].x;
-            var minZa = srcPoints[0].z;
-            var maxZa = srcPoints[0].z;
-            for (int i = 1; i < srcPoints.Length; i++)
+            float minOverlap = float.MaxValue;
+            Vector3 minAxis = axis[0];
+            float overlap;
+            for (int i = 0; i < axis.Length; i++)
             {
-                minXa = Mathf.Min(minXa, srcPoints[i].x);
-                maxXa = Mathf.Max(maxXa, srcPoints[i].x);
-                minZa = Mathf.Min(minZa, srcPoints[i].z);
-                maxZa = Mathf.Max(maxZa, srcPoints[i].z);
+                if (!ProjectOverlapTest(axis[i], srcPoints, dstPoints, out overlap))
+                {
+                    normal = Vector3.zero;
+                    penetration = 0;
+                    return false;
+                }
+                else
+                {
+                    if (overlap < minOverlap)
+                    {
+                        minOverlap = overlap;
+                        minAxis = axis[i];
+                    }
+                }
             }
+            normal = minAxis;
+            penetration = minOverlap;
+            return true;
+        }
 
-            var minXb = invPoints[0].x;
-            var maxXb = invPoints[0].x;
-            var minZb = invPoints[0].z;
-            var maxZb = invPoints[0].z;
-            for (int i = 1; i < invPoints.Length; i++)
-            {
-                minXb = Mathf.Min(minXb, invPoints[i].x);
-                maxXb = Mathf.Max(maxXb, invPoints[i].x);
-                minZb = Mathf.Min(minZb, invPoints[i].z);
-                maxZb = Mathf.Max(maxZb, invPoints[i].z);
-            }
-
-            if (maxXa <= minXb || minXa >= maxXb || maxZa <= minZb || minZa >= maxZb)
+        public static bool Intersect(CubeXCollider src, CubeXCollider dst, out XContact? contact)
+        {
+            Vector3 normal;
+            float penetration;
+            if (!SATTest(src, dst, out normal, out penetration))
             {
                 contact = null;
                 return false;
             }
-            // 为解决在内部问题
-            var minYa = -srcExtents.y;
-            var maxYa = srcExtents.y;
-            var minYb = -dstExtents.y + dst.Position.y - src.Position.y;
-            var maxYb = dstExtents.y + dst.Position.y - src.Position.y;
-            float leastPenetration = float.MaxValue;
-            Vector3 normal = Vector3.up;
-            // Y axis
-            if (minYb < maxYa && minYb > minYa && maxYb > maxYa)
+            var srcExtents = src.Size * 0.5f;
+            var dstExtents = dst.Size * 0.5f;
+            var srcMinY = src.Position.y - srcExtents.y;
+            var srcMaxY = src.Position.y + srcExtents.y;
+            var dstMinY = dst.Position.y - dstExtents.y;
+            var dstMaxY = dst.Position.y + dstExtents.y;
+
+            var overlapY = Mathf.Min(srcMaxY, dstMaxY) - Mathf.Max(srcMinY, dstMinY);
+            if ((srcMaxY > dstMaxY && srcMinY < dstMinY) || (srcMaxY < dstMaxY && srcMinY > dstMinY))
             {
-                var penetration = maxYa - minYb;
-                if (penetration < leastPenetration)
-                {
-                    leastPenetration = penetration;
-                    normal = Vector3.up;
-                }
-            }
-            else if (maxYb > minYa && maxYb < maxYa && minYb < minYa)
-            {
-                var penetration = maxYb - minYa;
-                if (penetration < leastPenetration)
-                {
-                    leastPenetration = penetration;
-                    normal = Vector3.down;
-                }
-            }
-            // X axis
-            if (minXb < maxXa && minXb > minXa && maxXb > maxXa)
-            {
-                var penetration = maxXa - minXb;
-                if (penetration < leastPenetration)
-                {
-                    leastPenetration = penetration;
-                    normal = Vector3.right;
-                }
-            }
-            else if (maxXb > minXa && maxXb < maxXa && minXb < minXa)
-            {
-                var penetration = maxXb - minXa;
-                if (penetration < leastPenetration)
-                {
-                    leastPenetration = penetration;
-                    normal = Vector3.left;
-                }
-            }
-            // Z axis
-            if (minZb < maxZa && minZb > minZa && maxZb > maxZa)
-            {
-                var penetration = maxZa - minZb;
-                if (penetration < leastPenetration)
-                {
-                    leastPenetration = penetration;
-                    normal = Vector3.forward;
-                }
-            }
-            else if (maxZb > minZa && maxZb < maxZa && minZb < minZa)
-            {
-                var penetration = maxZb - minZa;
-                if (penetration < leastPenetration)
-                {
-                    leastPenetration = penetration;
-                    normal = Vector3.back;
-                }
+                var min = Mathf.Abs(srcMinY - dstMinY);
+                var max = Mathf.Abs(srcMaxY - dstMaxY);
+                overlapY += Mathf.Min(min, max);
             }
 
-            contact = new XContact(src, dst, src.Quaternion * normal, leastPenetration);
+            if (overlapY < penetration)
+            {
+                penetration = overlapY;
+                normal = Vector3.up;
+            }
+
+            if (Vector3.Dot(normal, dst.Position-src.Position) < 0)
+            {
+                normal = -normal;
+            }
+
+            contact = new XContact(src, dst, normal, penetration);
             return true;
         }
 
